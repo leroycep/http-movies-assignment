@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Route } from "react-router-dom";
 import SavedList from "./Movies/SavedList";
 import MovieList from "./Movies/MovieList";
+import UpdateMovie from "./Movies/Update";
 import Movie from "./Movies/Movie";
 import axios from "axios";
 
@@ -22,6 +23,18 @@ const App = () => {
     setSavedList([...savedList, movie]);
   };
 
+  const updateMovie = movie => {
+    return axios
+      .put(`${BASE_URL}/api/movies/${movie.id}`, movie)
+      .then(res => {
+        const updatedMovie = res.data;
+        setMovieList(
+          movieList.map(m => (m.id === updatedMovie.id ? updatedMovie : m))
+        );
+      })
+      .catch(err => console.log(err.response));
+  };
+
   useEffect(() => {
     getMovieList();
   }, []);
@@ -36,6 +49,10 @@ const App = () => {
 
       <Route path="/movies/:id">
         <Movie addToSavedList={addToSavedList} />
+      </Route>
+
+      <Route path="/update-movie/:id">
+        <UpdateMovie {...{ movieList, updateMovie }} />
       </Route>
     </>
   );
